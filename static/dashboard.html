@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PHISHING URL DETECTION USING XGBOOST ALGORITHM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--success-color);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .user-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 0.5rem 0;
+            min-width: 220px;
+            display: none;
+            z-index: 200;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown.active {
+            display: block;
+            animation: fadeInDown 0.3s ease-out;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--error-color);
+        }
+
+        /* Enhanced Scanner Section */
+        .scanner-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanner-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .scanner-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .scanner-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanner-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .url-input:valid:not(:placeholder-shown) {
+            border-color: var(--success-color);
+        }
+
+        .scan-btn {
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scan-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .scan-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .scan-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .scan-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .quick-action-btn {
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-action-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Results Section */
+        .results-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .result-main {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .result-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .result-safe {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+
+        .result-phishing {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+            color: white;
+        }
+
+        .result-blacklisted {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .result-info h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .result-url {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            word-break: break-all;
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Metrics */
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Enhanced Gauge Chart */
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        #gauge {
+            max-width: 350px;
+        }
+
+        /* Enhanced Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .feature-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced History Section */
+        .history-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .view-all-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-all-btn:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .history-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .history-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .history-icon.safe {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+
+        .history-icon.phishing {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+            color: white;
+        }
+
+        .history-icon.blacklisted {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .history-details {
+            flex: 1;
+        }
+
+        .history-url {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            word-break: break-all;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        .history-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .history-label {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+
+        .label-safe {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .label-phishing {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .label-blacklisted {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .history-date {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* Enhanced Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            max-width: 400px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success-color);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--error-color);
+        }
+
+        .notification.warning .notification-icon {
+            color: var(--warning-color);
+        }
+
+        .notification-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .notification-close:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .logo {
+                font-size: 0.8rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .url-input-group {
+                flex-direction: column;
+            }
+
+            .result-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .result-main {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .result-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .history-content {
+                width: 100%;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    PHISHING URL DETECTION<br>
+                    <small style="font-size: 0.7em; color: #64748b;">USING XGBOOST ALGORITHM</small>
+                </div>
+            </a>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <div class="user-avatar" id="user-avatar" onclick="toggleDropdown()">
+                        U
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">Loading...</div>
+                        <div class="user-status" id="user-status">Member</div>
+                    </div>
+                    <div class="dropdown" id="user-dropdown">
+                        <a href="profile.html" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Profile Settings
+                        </a>
+                        <a href="history.html" class="dropdown-item">
+                            <i class="fas fa-history"></i>
+                            XGBoost Scan History
+                        </a>
+                        <a href="blacklist.html" class="dropdown-item">
+                            <i class="fas fa-ban"></i>
+                            XGBoost Blacklist
+                        </a>
+                        <a href="preferences.html" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            Preferences
+                        </a>
+                        <hr style="margin: 0.5rem 0; border: 1px solid #e2e8f0;">
+                        <div class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <h1 class="page-title">XGBoost Security Dashboard</h1>
+            <p class="page-subtitle">Monitor your security scans and protect yourself from phishing threats using advanced XGBoost ML algorithms</p>
+        </div>
+
+        <!-- Enhanced Stats Grid -->
+        <div class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total XGBoost Scans</span>
+                    <div class="stat-icon blue">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="total-scans">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i>
+                    All time scans
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Safe URLs Verified</span>
+                    <div class="stat-icon green">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="safe-urls">0</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-check"></i>
+                    XGBoost verified safe
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Threats Blocked</span>
+                    <div class="stat-icon red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="threats-blocked">0</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-shield-virus"></i>
+                    Phishing attempts
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">XGBoost Accuracy</span>
+                    <div class="stat-icon purple">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                </div>
+                <div class="stat-value">98.5%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-brain"></i>
+                    ML Detection accuracy
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Scanner Section -->
+        <div class="scanner-section fade-in-up">
+            <div class="scanner-header">
+                <h2 class="scanner-title">XGBoost URL Security Scanner</h2>
+                <div class="scanner-badge">Powered by Advanced Machine Learning</div>
+            </div>
+            
+            <div class="url-input-group">
+                <input type="url" class="url-input" id="url-input" 
+                       placeholder="Enter URL to scan for phishing threats using XGBoost algorithm..." 
+                       autocomplete="off" spellcheck="false"
+                       pattern="https?://.*">
+                <button class="scan-btn" id="scan-btn" onclick="scanURL()">
+                    <i class="fas fa-search"></i>
+                    <span>Scan with XGBoost</span>
+                </button>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="fillSamplePhishing()">
+                    <i class="fas fa-vial"></i>
+                    Test Phishing Sample
+                </button>
+                <button class="quick-action-btn" onclick="fillSampleSafe()">
+                    <i class="fas fa-check-circle"></i>
+                    Test Safe Sample
+                </button>
+                <button class="quick-action-btn" onclick="showScanHistory()">
+                    <i class="fas fa-history"></i>
+                    Recent Scans
+                </button>
+                <button class="quick-action-btn" onclick="clearInput()">
+                    <i class="fas fa-times"></i>
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Results Section -->
+        <div class="results-section" id="results-section">
+            <div class="result-header">
+                <div class="result-main">
+                    <div class="result-icon" id="result-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="result-info">
+                        <h3 id="result-title">XGBoost Analysis Complete</h3>
+                        <p class="result-url" id="result-url"></p>
+                    </div>
+                </div>
+                <div class="result-actions" id="result-actions" style="display: none;">
+                    <button class="btn-danger" id="blacklist-btn" onclick="addCurrentUrlToBlacklist()" title="Add to XGBoost Blacklist">
+                        <i class="fas fa-ban"></i>
+                        Add to Blacklist
+                    </button>
+                    <button class="btn-secondary" onclick="shareResult()" title="Share Result">
+                        <i class="fas fa-share"></i>
+                        Share
+                    </button>
+                    <button class="btn-secondary" onclick="viewDetails()" title="View Details">
+                        <i class="fas fa-info-circle"></i>
+                        Details
+                    </button>
+                </div>
+            </div>
+
+            <div class="result-metrics" id="result-metrics">
+                <!-- Metrics will be populated here -->
+            </div>
+
+            <div class="gauge-container">
+                <div id="gauge"></div>
+            </div>
+
+            <div class="features-grid" id="features-grid">
+                <!-- Features will be populated here -->
+            </div>
+        </div>
+
+        <!-- Enhanced Recent History -->
+        <div class="history-section fade-in-up">
+            <div class="history-header">
+                <h2 class="history-title">Recent XGBoost Scans</h2>
+                <a href="history.html" class="view-all-btn">View All History</a>
+            </div>
+            
+            <div class="history-list" id="history-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading recent XGBoost scans...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Notification Template -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="notification-icon" id="notification-icon"></i>
+            <div class="notification-text" id="notification-text"></div>
+            <button class="notification-close" onclick="hideNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        let userBlacklist = [];
+        let recentScans = [];
+
+        // Enhanced authentication check
+        if (!authToken) {
+            window.location.href = 'login.html';
+        }
+
+        // DOM Elements
+        const urlInput = document.getElementById('url-input');
+        const scanBtn = document.getElementById('scan-btn');
+        const resultsSection = document.getElementById('results-section');
+        const historyList = document.getElementById('history-list');
+
+        // Initialize dashboard with enhanced error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                loadUserProfile();
+                loadDashboardStats();
+                loadRecentHistory();
+                loadUserBlacklist();
+                setupEventListeners();
+                setupKeyboardShortcuts();
+                startPerformanceMonitoring();
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showNotification('Failed to initialize dashboard', 'error');
+            }
+        });
+
+        // Enhanced event listeners
+        function setupEventListeners() {
+            // Enhanced URL input validation
+            urlInput.addEventListener('input', function(e) {
+                validateUrlInput(e.target);
+            });
+
+            // Enter key listener for URL input
+            urlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    scanURL();
+                }
+            });
+
+            // Real-time URL validation
+            urlInput.addEventListener('blur', function(e) {
+                validateUrlInput(e.target);
+            });
+
+            // Auto-save draft URLs
+            urlInput.addEventListener('input', debounce(function(e) {
+                if (e.target.value.trim()) {
+                    localStorage.setItem('draftUrl', e.target.value.trim());
+                }
+            }, 500));
+
+            // Load draft URL on page load
+            const draftUrl = localStorage.getItem('draftUrl');
+            if (draftUrl && !urlInput.value) {
+                urlInput.value = draftUrl;
+                validateUrlInput(urlInput);
+            }
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'k':
+                            e.preventDefault();
+                            urlInput.focus();
+                            urlInput.select();
+                            break;
+                        case 'Enter':
+                            if (document.activeElement === urlInput) {
+                                e.preventDefault();
+                                scanURL();
+                            }
+                            break;
+                        case 'h':
+                            e.preventDefault();
+                            window.location.href = 'history.html';
+                            break;
+                        case 'b':
+                            e.preventDefault();
+                            window.location.href = 'blacklist.html';
+                            break;
+                    }
+                }
+            });
+        }
+
+        // Enhanced URL validation
+        function validateUrlInput(input) {
+            const url = input.value.trim();
+            const urlRegex = /^https?:\/\/(?:[-\w.])+(?:\:[0-9]+)?(?:\/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:\#(?:[\w.])*)?)?$/;
+            
+            input.classList.remove('error', 'success');
+            
+            if (url) {
+                if (urlRegex.test(url)) {
+                    input.classList.add('success');
+                    enableScanButton();
+                } else {
+                    input.classList.add('error');
+                    disableScanButton();
+                }
+            } else {
+                disableScanButton();
+            }
+        }
+
+        function enableScanButton() {
+            scanBtn.disabled = false;
+            scanBtn.style.opacity = '1';
+        }
+
+        function disableScanButton() {
+            scanBtn.disabled = true;
+            scanBtn.style.opacity = '0.6';
+        }
+
+        // Load user blacklist with retry mechanism
+        async function loadUserBlacklist(retryCount = 0) {
+            try {
+                const response = await fetch(`${API_BASE}/blacklist`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    userBlacklist = await response.json();
+                } else if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Failed to load blacklist:', error);
+                if (retryCount < 2) {
+                    setTimeout(() => loadUserBlacklist(retryCount + 1), 1000);
+                }
+            }
+        }
+
+        // Enhanced blacklist checking
+        function isUrlBlacklisted(url) {
+            const domain = cleanDomainName(url);
+            return userBlacklist.some(item => 
+                item.domain === domain && item.status === 'active'
+            );
+        }
+
+        // Enhanced user profile loading
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    updateUserInfo();
+                } else if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                } else {
+                    throw new Error('Failed to load profile');
+                }
+            } catch (error) {
+                console.error('Profile loading error:', error);
+                showNotification('Failed to load user profile', 'error');
+            }
+        }
+
+        // Enhanced user info update
+        function updateUserInfo() {
+            const avatar = document.getElementById('user-avatar');
+            const name = document.getElementById('user-name');
+            const status = document.getElementById('user-status');
+
+            const displayName = currentUser.full_name || currentUser.username;
+            avatar.textContent = displayName[0].toUpperCase();
+            name.textContent = displayName;
+            status.textContent = `${currentUser.scan_count || 0} XGBoost scans performed`;
+        }
+
+        // Enhanced dashboard statistics with animations
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE}/history?limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const history = await response.json();
+                    updateStats(history);
+                }
+            } catch (error) {
+                console.error('Stats loading error:', error);
+                // Use fallback stats
+                updateStats([]);
+            }
+        }
+
+        // Enhanced statistics update with smooth animations
+        function updateStats(history) {
+            const totalScans = history.length;
+            const safeUrls = history.filter(scan => !scan.label.includes('Phishing')).length;
+            const threatsBlocked = history.filter(scan => scan.label.includes('Phishing')).length;
+
+            animateCounter('total-scans', totalScans);
+            animateCounter('safe-urls', safeUrls);
+            animateCounter('threats-blocked', threatsBlocked);
+        }
+
+        // Smooth counter animation
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const startValue = parseInt(element.textContent) || 0;
+            const duration = 1500;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.round(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Enhanced recent history loading
+        async function loadRecentHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history?limit=5`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    recentScans = await response.json();
+                    displayRecentHistory(recentScans);
+                } else {
+                    throw new Error('Failed to load history');
+                }
+            } catch (error) {
+                console.error('History loading error:', error);
+                historyList.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><h3>Failed to load scan history</h3><p>Please try refreshing the page</p></div>';
+            }
+        }
+
+        // Enhanced history display
+        function displayRecentHistory(history) {
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No XGBoost scans yet</h3>
+                        <p>Start by scanning your first URL above to see XGBoost ML analysis results!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            historyList.innerHTML = history.map(scan => `
+                <div class="history-item" onclick="viewScanDetails(${scan.id})">
+                    <div class="history-content">
+                        <div class="history-icon ${getHistoryIconClass(scan.label)}">
+                            <i class="fas fa-${getHistoryIcon(scan.label)}"></i>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-url">${truncateUrl(scan.url, 50)}</div>
+                            <div class="history-meta">
+                                <span class="history-label ${getLabelClass(scan.label)}">
+                                    ${scan.label}
+                                </span>
+                                <span>Confidence: ${scan.confidence}%</span>
+                                <span>Risk: ${scan.risk_score}/100</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-date" title="${formatFullDate(scan.scan_date)}">
+                        ${formatRelativeDate(scan.scan_date)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Enhanced scan URL function
+        async function scanURL() {
+            const url = urlInput.value.trim();
+            if (!url) {
+                showNotification('Please enter a URL to scan', 'error');
+                urlInput.focus();
+                return;
+            }
+
+            // Enhanced URL validation
+            if (!isValidUrl(url)) {
+                showNotification('Please enter a valid URL (must start with http:// or https://)', 'error');
+                urlInput.focus();
+                return;
+            }
+
+            // Check if URL is blacklisted first
+            await loadUserBlacklist();
+            if (isUrlBlacklisted(url)) {
+                displayBlacklistedResult(url);
+                return;
+            }
+
+            // Update button state with enhanced feedback
+            updateScanButtonState(true);
+            resultsSection.classList.remove('active');
+
+            try {
+                const startTime = performance.now();
+                
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+                const endTime = performance.now();
+                const scanTime = ((endTime - startTime) / 1000).toFixed(2);
+
+                if (response.ok) {
+                    displayScanResult({...data, actual_scan_time: scanTime});
+                    loadDashboardStats();
+                    loadRecentHistory();
+                    
+                    // Clear draft URL
+                    localStorage.removeItem('draftUrl');
+                    
+                    showNotification('XGBoost URL scan completed successfully', 'success');
+                } else {
+                    throw new Error(data.detail || 'Scan failed');
+                }
+            } catch (error) {
+                console.error('Scan error:', error);
+                showNotification('Scan failed: ' + error.message, 'error');
+            } finally {
+                updateScanButtonState(false);
+            }
+        }
+
+        // Enhanced scan button state management
+        function updateScanButtonState(scanning) {
+            if (scanning) {
+                scanBtn.disabled = true;
+                scanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Analyzing with XGBoost...</span>';
+                scanBtn.style.background = '#94a3b8';
+            } else {
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<i class="fas fa-search"></i> <span>Scan with XGBoost</span>';
+                scanBtn.style.background = '';
+            }
+        }
+
+        // Enhanced URL validation
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return string.startsWith('http://') || string.startsWith('https://');
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Enhanced blacklisted result display
+        function displayBlacklistedResult(url) {
+            const resultIcon = document.getElementById('result-icon');
+            const resultTitle = document.getElementById('result-title');
+            const resultUrl = document.getElementById('result-url');
+            const resultActions = document.getElementById('result-actions');
+            const resultMetrics = document.getElementById('result-metrics');
+            const featuresGrid = document.getElementById('features-grid');
+
+            resultIcon.className = 'result-icon result-blacklisted';
+            resultIcon.innerHTML = '<i class="fas fa-ban"></i>';
+            resultTitle.textContent = 'URL Blocked - In Your XGBoost Blacklist';
+            resultUrl.textContent = url;
+
+            resultActions.style.display = 'none';
+
+            resultMetrics.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Blocked</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">Personal</div>
+                    <div class="metric-label">Blacklist</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.001s</div>
+                    <div class="metric-label">Processing Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">XGBoost</div>
+                    <div class="metric-label">Enhanced</div>
+                </div>
+            `;
+
+            d3.select("#gauge").html("");
+            createGaugeChart(1);
+
+            featuresGrid.innerHTML = `
+                <div class="feature-card">
+                    <div class="feature-name">Blacklist Status</div>
+                    <div class="feature-value">Blocked</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-name">Added By</div>
+                    <div class="feature-value">You</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-name">Block Type</div>
+                    <div class="feature-value">Personal</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-name">XGBoost Enhanced</div>
+                    <div class="feature-value">Yes</div>
+                </div>
+            `;
+
+            resultsSection.classList.add('active');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            showNotification('URL blocked by your personal XGBoost blacklist', 'warning');
+        }
+
+        // Enhanced scan result display
+        function displayScanResult(data) {
+            const isPhishing = data.label.includes('Phishing');
+            const resultIcon = document.getElementById('result-icon');
+            const resultTitle = document.getElementById('result-title');
+            const resultUrl = document.getElementById('result-url');
+            const resultActions = document.getElementById('result-actions');
+            const resultMetrics = document.getElementById('result-metrics');
+            const featuresGrid = document.getElementById('features-grid');
+
+            resultIcon.className = `result-icon ${isPhishing ? 'result-phishing' : 'result-safe'}`;
+            resultIcon.innerHTML = `<i class="fas fa-${isPhishing ? 'exclamation-triangle' : 'shield-alt'}"></i>`;
+            resultTitle.textContent = isPhishing ? 'Phishing Threat Detected by XGBoost' : 'URL is Safe - XGBoost Verified';
+            resultUrl.textContent = data.url;
+
+            resultActions.style.display = 'flex';
+            window.currentScanUrl = data.url;
+
+            resultMetrics.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">${data.confidence}%</div>
+                    <div class="metric-label">XGBoost Confidence</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.risk_score}</div>
+                    <div class="metric-label">Risk Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${data.actual_scan_time || data.prediction_time}s</div>
+                    <div class="metric-label">Processing Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">XGBoost</div>
+                    <div class="metric-label">Algorithm</div>
+                </div>
+            `;
+
+            createGaugeChart(data.risk_score / 100);
+
+            if (data.features && typeof data.features === 'object') {
+                const features = data.features;
+                featuresGrid.innerHTML = Object.entries(features).map(([key, value]) => `
+                    <div class="feature-card">
+                        <div class="feature-name">${formatFeatureName(key)}</div>
+                        <div class="feature-value">${formatFeatureValue(key, value)}</div>
+                    </div>
+                `).join('');
+            } else {
+                featuresGrid.innerHTML = `
+                    <div class="feature-card">
+                        <div class="feature-name">XGBoost Analysis</div>
+                        <div class="feature-value">Complete</div>
+                    </div>
+                `;
+            }
+
+            resultsSection.classList.add('active');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Enhanced add to blacklist function
+        async function addCurrentUrlToBlacklist() {
+            if (!window.currentScanUrl) {
+                showNotification('No URL to blacklist', 'error');
+                return;
+            }
+
+            const domain = cleanDomainName(window.currentScanUrl);
+            
+            if (!confirm(`Add "${domain}" to your XGBoost blacklist?\n\nThis will block future access to this domain.`)) {
+                return;
+            }
+
+            const blacklistBtn = document.getElementById('blacklist-btn');
+            blacklistBtn.disabled = true;
+            blacklistBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            try {
+                const response = await fetch(`${API_BASE}/blacklist`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        domain: domain,
+                        category: 'custom',
+                        description: 'Added from XGBoost dashboard scan'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    await loadUserBlacklist();
+                    showNotification(data.message || `Successfully added ${domain} to XGBoost blacklist`, 'success');
+                    blacklistBtn.innerHTML = '<i class="fas fa-check"></i> Added to Blacklist';
+                    blacklistBtn.disabled = true;
+                } else {
+                    throw new Error(data.detail || 'Failed to add to blacklist');
+                }
+            } catch (error) {
+                console.error('Blacklist error:', error);
+                showNotification('Failed to add to XGBoost blacklist: ' + error.message, 'error');
+                blacklistBtn.disabled = false;
+                blacklistBtn.innerHTML = '<i class="fas fa-ban"></i> Add to Blacklist';
+            }
+        }
+
+        // Enhanced gauge chart with better visual design
+        function createGaugeChart(value) {
+            d3.select("#gauge").html("");
+            
+            const width = 350, height = 250;
+            const radius = Math.min(width, height) / 2 - 30;
+            
+            const svg = d3.select("#gauge")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", `translate(${width/2}, ${height/2 + 20})`);
+            
+            // Enhanced color scale
+            const colorScale = d3.scaleLinear()
+                .domain([0, 0.3, 0.7, 1])
+                .range(["#10b981", "#f59e0b", "#ef4444", "#dc2626"]);
+            
+            // Background arc with gradient
+            const backgroundArc = d3.arc()
+                .innerRadius(radius * 0.7)
+                .outerRadius(radius)
+                .startAngle(-Math.PI / 2)
+                .endAngle(Math.PI / 2);
+            
+            svg.append("path")
+                .attr("d", backgroundArc)
+                .style("fill", "#e2e8f0")
+                .style("opacity", 0.3);
+            
+            // Foreground arc with animation
+            const foregroundArc = d3.arc()
+                .innerRadius(radius * 0.7)
+                .outerRadius(radius)
+                .startAngle(-Math.PI / 2)
+                .endAngle(-Math.PI / 2);
+            
+            const foregroundPath = svg.append("path")
+                .attr("d", foregroundArc)
+                .style("fill", colorScale(value));
+            
+            // Animate the gauge
+            foregroundPath.transition()
+                .duration(1500)
+                .ease(d3.easeBackOut)
+                .attrTween("d", function() {
+                    const interpolate = d3.interpolate(-Math.PI / 2, -Math.PI / 2 + Math.PI * value);
+                    return function(t) {
+                        const endAngle = interpolate(t);
+                        return d3.arc()
+                            .innerRadius(radius * 0.7)
+                            .outerRadius(radius)
+                            .startAngle(-Math.PI / 2)
+                            .endAngle(endAngle)();
+                    };
+                });
+            
+            // Center text with animation
+            const centerText = svg.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "0.35em")
+                .style("font-size", "2.5rem")
+                .style("font-weight", "bold")
+                .style("fill", colorScale(value))
+                .text("0%");
+            
+            centerText.transition()
+                .duration(1500)
+                .ease(d3.easeBackOut)
+                .tween("text", function() {
+                    const interpolate = d3.interpolate(0, Math.round(value * 100));
+                    return function(t) {
+                        this.textContent = Math.round(interpolate(t)) + "%";
+                    };
+                });
+            
+            // Label
+            svg.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "3em")
+                .style("font-size", "1rem")
+                .style("fill", "#64748b")
+                .style("font-weight", "500")
+                .text("XGBoost Risk Level");
+            
+            // Add tick marks
+            const ticks = [0, 0.25, 0.5, 0.75, 1];
+            ticks.forEach(tick => {
+                const angle = -Math.PI / 2 + Math.PI * tick;
+                const x1 = Math.cos(angle) * (radius * 0.65);
+                const y1 = Math.sin(angle) * (radius * 0.65);
+                const x2 = Math.cos(angle) * (radius * 0.6);
+                const y2 = Math.sin(angle) * (radius * 0.6);
+                
+                svg.append("line")
+                    .attr("x1", x1)
+                    .attr("y1", y1)
+                    .attr("x2", x2)
+                    .attr("y2", y2)
+                    .style("stroke", "#94a3b8")
+                    .style("stroke-width", 2);
+            });
+        }
+
+        // Quick action functions
+        function fillSamplePhishing() {
+            urlInput.value = "https://suspicious-bank-login.phishing-example.com";
+            validateUrlInput(urlInput);
+            showNotification('Sample phishing URL loaded for testing', 'info');
+        }
+
+        function fillSampleSafe() {
+            urlInput.value = "https://google.com";
+            validateUrlInput(urlInput);
+            showNotification('Sample safe URL loaded for testing', 'info');
+        }
+
+        function showScanHistory() {
+            window.location.href = 'history.html';
+        }
+
+        function clearInput() {
+            urlInput.value = '';
+            urlInput.classList.remove('error', 'success');
+            disableScanButton();
+            localStorage.removeItem('draftUrl');
+            showNotification('Input cleared', 'info');
+        }
+
+        // Additional result actions
+        function shareResult() {
+            if (!window.currentScanUrl) return;
+            
+            const resultText = `XGBoost scan result for ${window.currentScanUrl}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'XGBoost URL Scan Result',
+                    text: resultText,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(resultText).then(() => {
+                    showNotification('Result copied to clipboard', 'success');
+                });
+            }
+        }
+
+        function viewDetails() {
+            if (!window.currentScanUrl) return;
+            // Could open a detailed modal or navigate to detailed view
+            showNotification('Detailed view feature coming soon', 'info');
+        }
+
+        function viewScanDetails(scanId) {
+            // Navigate to detailed scan view
+            window.location.href = `history.html#scan-${scanId}`;
+        }
+
+        // Utility functions with enhancements
+        function cleanDomainName(url) {
+            try {
+                const domain = url
+                    .replace(/^https?:\/\//, '')
+                    .replace(/^www\./, '')
+                    .replace(/\/.*$/, '')
+                    .split(':')[0];
+                return domain.toLowerCase();
+            } catch (e) {
+                return url.toLowerCase();
+            }
+        }
+
+        function formatFeatureName(name) {
+            return name.replace(/_/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase())
+                      .replace(/Url/g, 'URL')
+                      .replace(/Http/g, 'HTTP')
+                      .replace(/Https/g, 'HTTPS');
+        }
+
+        function formatFeatureValue(key, value) {
+            if (typeof value === 'boolean') {
+                return value ? 'Yes' : 'No';
+            }
+            if (typeof value === 'number') {
+                return value % 1 === 0 ? value.toString() : value.toFixed(2);
+            }
+            return value;
+        }
+
+        function formatRelativeDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffMinutes < 60) {
+                return `${diffMinutes}m ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours}h ago`;
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays <= 7) {
+                return `${diffDays}d ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        function formatFullDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function truncateUrl(url, maxLength) {
+            if (url.length <= maxLength) return url;
+            return url.substring(0, maxLength - 3) + '...';
+        }
+
+        function getLabelClass(label) {
+            if (label.includes('Blacklisted')) return 'label-blacklisted';
+            if (label.includes('Phishing')) return 'label-phishing';
+            return 'label-safe';
+        }
+
+        function getHistoryIconClass(label) {
+            if (label.includes('Blacklisted')) return 'blacklisted';
+            if (label.includes('Phishing')) return 'phishing';
+            return 'safe';
+        }
+
+        function getHistoryIcon(label) {
+            if (label.includes('Blacklisted')) return 'ban';
+            if (label.includes('Phishing')) return 'exclamation-triangle';
+            return 'shield-alt';
+        }
+
+        // Enhanced dropdown functions
+        function toggleDropdown() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('user-dropdown');
+            
+            if (!userMenu.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Enhanced logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('draftUrl');
+                showNotification('Logged out successfully', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+            }
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notification-icon');
+            const text = document.getElementById('notification-text');
+
+            notification.className = `notification ${type}`;
+            icon.className = `notification-icon fas fa-${getNotificationIcon(type)}`;
+            text.textContent = message;
+
+            notification.classList.add('show');
+
+            // Auto hide with different durations based on type
+            const duration = type === 'error' ? 6000 : type === 'warning' ? 5000 : 4000;
+            setTimeout(() => {
+                hideNotification();
+            }, duration);
+        }
+
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return 'check-circle';
+                case 'error': return 'exclamation-circle';
+                case 'warning': return 'exclamation-triangle';
+                case 'info': return 'info-circle';
+                default: return 'check-circle';
+            }
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+
+        // Utility function for debouncing
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Performance monitoring
+        function startPerformanceMonitoring() {
+            if ('performance' in window) {
+                window.addEventListener('load', function() {
+                    setTimeout(() => {
+                        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                        console.log(`XGBoost Dashboard loaded in ${loadTime}ms`);
+                        
+                        // Log performance metrics for optimization
+                        if (loadTime > 3000) {
+                            console.warn('Dashboard loading time is slower than expected');
+                        }
+                    }, 0);
+                });
+            }
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+            showNotification('An unexpected error occurred in XGBoost dashboard', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            showNotification('A network error occurred while connecting to XGBoost service', 'error');
+        });
+
+        // Service Worker registration for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        // Enhanced accessibility
+        document.addEventListener('keydown', function(e) {
+            // Skip links for accessibility
+            if (e.altKey && e.key === '1') {
+                urlInput.focus();
+            }
+            if (e.altKey && e.key === '2') {
+                document.querySelector('.history-section').scrollIntoView();
+            }
+        });
+
+        // Auto-refresh functionality for real-time updates
+        setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                loadRecentHistory();
+            }
+        }, 60000); // Refresh every minute when tab is visible
+
+        // Handle online/offline status
+        window.addEventListener('online', function() {
+            showNotification('XGBoost service connection restored', 'success');
+            loadDashboardStats();
+            loadRecentHistory();
+        });
+
+        window.addEventListener('offline', function() {
+            showNotification('Connection lost - XGBoost scans unavailable', 'warning');
+        });
+
+        // Page visibility API for performance optimization
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // Refresh data when user returns to tab
+                loadDashboardStats();
+                loadRecentHistory();
+            }
+        });
+
+        // Preload critical resources
+        function preloadResources() {
+            const links = ['history.html', 'blacklist.html', 'profile.html'];
+            links.forEach(link => {
+                const linkElement = document.createElement('link');
+                linkElement.rel = 'prefetch';
+                linkElement.href = link;
+                document.head.appendChild(linkElement);
+            });
+        }
+
+        // Initialize preloading after page load
+        window.addEventListener('load', preloadResources);
+    </script>
+</body>
+</html>

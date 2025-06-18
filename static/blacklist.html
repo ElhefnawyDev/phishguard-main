@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XGBoost Blacklist Management - PHISHING URL DETECTION USING XGBOOST ALGORITHM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Add Domain Section */
+        .add-domain-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-domain-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-domain-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .domain-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .domain-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .category-select {
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            min-width: 150px;
+        }
+
+        .add-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        /* Blacklist Table */
+        .blacklist-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .blacklist-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        }
+
+        .blacklist-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .export-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* Filters */
+        .filters {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-width: 200px;
+            transition: var(--transition);
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        /* Table */
+        .blacklist-table-container {
+            overflow-x: auto;
+        }
+
+        .blacklist-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .blacklist-table th,
+        .blacklist-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .blacklist-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+
+        .blacklist-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .blacklist-table tbody tr:hover {
+            background: #f8fafc;
+            transform: scale(1.01);
+        }
+
+        .blacklist-table td {
+            font-size: 0.9rem;
+        }
+
+        .domain-cell {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .category-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-malware {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .category-phishing {
+            background: rgba(249, 115, 22, 0.1);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .category-spam {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .category-adult {
+            background: rgba(219, 39, 119, 0.1);
+            color: #db2777;
+            border: 1px solid rgba(219, 39, 119, 0.2);
+        }
+
+        .category-custom {
+            background: rgba(75, 85, 99, 0.1);
+            color: #4b5563;
+            border: 1px solid rgba(75, 85, 99, 0.2);
+        }
+
+        .status-active {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .status-inactive {
+            color: #6b7280;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .toggle-btn {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            background: #d97706;
+            transform: scale(1.1);
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .logo {
+                font-size: 0.8rem;
+            }
+
+            .add-domain-form {
+                flex-direction: column;
+            }
+
+            .domain-input {
+                min-width: 100%;
+            }
+
+            .bulk-actions {
+                flex-direction: column;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-input {
+                min-width: 100%;
+            }
+
+            .blacklist-table {
+                font-size: 0.8rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    PHISHING URL DETECTION<br>
+                    <small style="font-size: 0.7em; color: #64748b;">USING XGBOOST ALGORITHM</small>
+                </div>
+            </a>
+            
+            <div class="nav-right">
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <h1 class="page-title">XGBoost Blacklist Management</h1>
+            <p class="page-subtitle">Manage your personal blocked domains to enhance XGBoost security detection</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-value" id="total-blacklisted">0</div>
+                <div class="stat-label">Total XGBoost Blacklisted</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="active-domains">0</div>
+                <div class="stat-label">Active Domains</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="recent-additions">0</div>
+                <div class="stat-label">Added This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="blocked-attempts">0</div>
+                <div class="stat-label">XGBoost Blocked Attempts</div>
+            </div>
+        </div>
+
+        <!-- Add Domain Section -->
+        <div class="add-domain-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-ban"></i>
+                Add to XGBoost Personal Blacklist
+            </h3>
+            
+            <div class="add-domain-form">
+                <input type="text" class="domain-input" id="domain-input" 
+                       placeholder="Enter domain to blacklist for XGBoost protection (e.g., malicious-site.com)">
+                <select class="category-select" id="category-select">
+                    <option value="malware">Malware</option>
+                    <option value="phishing">Phishing</option>
+                    <option value="spam">Spam</option>
+                    <option value="adult">Adult Content</option>
+                    <option value="custom">Custom Block</option>
+                </select>
+                <button class="add-btn" id="add-btn" onclick="addToBlacklist()">
+                    <i class="fas fa-plus"></i>
+                    Add to XGBoost Blacklist
+                </button>
+            </div>
+
+            <div class="bulk-actions">
+                <button class="btn btn-secondary" onclick="showBulkImport()">
+                    <i class="fas fa-upload"></i>
+                    Bulk Import to XGBoost
+                </button>
+                <button class="btn btn-warning" onclick="clearAllBlacklist()">
+                    <i class="fas fa-trash"></i>
+                    Clear XGBoost Blacklist
+                </button>
+            </div>
+        </div>
+
+        <!-- Blacklist Table -->
+        <div class="blacklist-section fade-in-up">
+            <div class="blacklist-header">
+                <h3 class="blacklist-title">Your XGBoost Blacklisted Domains</h3>
+                <button class="btn export-btn" onclick="exportBlacklist()">
+                    <i class="fas fa-download"></i>
+                    Export XGBoost List
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <input type="text" class="filter-input" id="search-filter" 
+                       placeholder="Search XGBoost blacklisted domains..." onkeyup="applyFilters()">
+                <select class="filter-select" id="category-filter" onchange="applyFilters()">
+                    <option value="">All Categories</option>
+                    <option value="malware">Malware</option>
+                    <option value="phishing">Phishing</option>
+                    <option value="spam">Spam</option>
+                    <option value="adult">Adult Content</option>
+                    <option value="custom">Custom Block</option>
+                </select>
+                <select class="filter-select" id="status-filter" onchange="applyFilters()">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <button class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times"></i>
+                    Clear Filters
+                </button>
+            </div>
+            
+            <div class="blacklist-table-container">
+                <table class="blacklist-table" id="blacklist-table">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>Category</th>
+                            <th>Added Date</th>
+                            <th>Status</th>
+                            <th>XGBoost Blocked Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blacklist-tbody">
+                        <!-- Table rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                Loading XGBoost blacklist...
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <i class="fas fa-ban"></i>
+                <h3>No XGBoost blacklisted domains</h3>
+                <p>Start adding domains to your personal XGBoost blacklist to enhance security protection!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Domain Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit XGBoost Blacklist Entry</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Domain</label>
+                <input type="text" class="form-input" id="edit-domain" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-input" id="edit-category">
+                    <option value="malware">Malware</option>
+                    <option value="phishing">Phishing</option>
+                    <option value="spam">Spam</option>
+                    <option value="adult">Adult Content</option>
+                    <option value="custom">Custom Block</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description (Optional)</label>
+                <input type="text" class="form-input" id="edit-description" placeholder="Add XGBoost protection description...">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button class="btn add-btn" onclick="saveEdit()">Save XGBoost Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Import Modal -->
+    <div class="modal" id="bulk-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Bulk Import Domains to XGBoost Blacklist</h3>
+                <button class="close-btn" onclick="closeBulkModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Domains for XGBoost Protection (one per line)</label>
+                <textarea class="form-input" id="bulk-domains" rows="10" 
+                          placeholder="malicious-site1.com&#10;phishing-site2.com&#10;spam-domain3.com"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category for all XGBoost blocked domains</label>
+                <select class="form-input" id="bulk-category">
+                    <option value="malware">Malware</option>
+                    <option value="phishing">Phishing</option>
+                    <option value="spam">Spam</option>
+                    <option value="adult">Adult Content</option>
+                    <option value="custom">Custom Block</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeBulkModal()">Cancel</button>
+                <button class="btn add-btn" onclick="bulkImport()">Import to XGBoost Blacklist</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let authToken = localStorage.getItem('authToken');
+        let allBlacklist = [];
+        let filteredBlacklist = [];
+        let editingItem = null;
+
+        // Check authentication
+        if (!authToken) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlacklist();
+            loadStats();
+            setupEventListeners();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Enter key for adding domains
+            document.getElementById('domain-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addToBlacklist();
+                }
+            });
+
+            // Close modals when clicking outside
+            document.getElementById('edit-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+
+            document.getElementById('bulk-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeBulkModal();
+                }
+            });
+        }
+
+        // Load blacklist data from API
+        async function loadBlacklist() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/blacklist`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    allBlacklist = await response.json();
+                } else {
+                    throw new Error('Failed to load XGBoost blacklist');
+                }
+                
+                filteredBlacklist = [...allBlacklist];
+                displayBlacklist();
+            } catch (error) {
+                console.error('XGBoost blacklist loading error:', error);
+                showNotification('Failed to load XGBoost blacklist', 'error');
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/stats`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const stats = await response.json();
+                    updateStatistics(stats);
+                }
+            } catch (error) {
+                console.error('XGBoost stats loading error:', error);
+            }
+        }
+
+        // Update statistics display
+        function updateStatistics(stats) {
+            animateCounter('total-blacklisted', stats.total_blacklisted || 0);
+            animateCounter('active-domains', stats.active_blacklisted || 0);
+            animateCounter('recent-additions', stats.recent_additions || 0);
+            animateCounter('blocked-attempts', stats.total_blocked || 0);
+        }
+
+        // Animate counter
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const startValue = parseInt(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.round(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Add domain to blacklist
+        async function addToBlacklist() {
+            const domainInput = document.getElementById('domain-input');
+            const categorySelect = document.getElementById('category-select');
+            const addBtn = document.getElementById('add-btn');
+
+            const domain = domainInput.value.trim();
+            const category = categorySelect.value;
+
+            if (!domain) {
+                showNotification('Please enter a domain for XGBoost blacklist', 'error');
+                return;
+            }
+
+            // Disable button during processing
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding to XGBoost...';
+
+            try {
+                const response = await fetch(`${API_BASE}/blacklist`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        domain: domain,
+                        category: category,
+                        description: 'Added to XGBoost blacklist protection'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Clear input
+                    domainInput.value = '';
+                    
+                    // Reload data
+                    await loadBlacklist();
+                    await loadStats();
+                    
+                    showNotification(data.message || `Successfully added ${domain} to XGBoost blacklist`, 'success');
+                } else {
+                    throw new Error(data.detail || 'Failed to add domain to XGBoost blacklist');
+                }
+            } catch (error) {
+                console.error('Error adding domain to XGBoost blacklist:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Add to XGBoost Blacklist';
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchFilter = document.getElementById('search-filter').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            filteredBlacklist = allBlacklist.filter(item => {
+                const matchesSearch = !searchFilter || item.domain.toLowerCase().includes(searchFilter);
+                const matchesCategory = !categoryFilter || item.category === categoryFilter;
+                const matchesStatus = !statusFilter || item.status === statusFilter;
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            displayBlacklist();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('search-filter').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('status-filter').value = '';
+            
+            filteredBlacklist = [...allBlacklist];
+            displayBlacklist();
+            showNotification('XGBoost blacklist filters cleared', 'success');
+        }
+
+        // Display blacklist table
+        function displayBlacklist() {
+            const tbody = document.getElementById('blacklist-tbody');
+
+            if (filteredBlacklist.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideEmptyState();
+
+            tbody.innerHTML = filteredBlacklist.map((item, index) => `
+                <tr>
+                    <td class="domain-cell">${item.domain}</td>
+                    <td>
+                        <span class="category-badge category-${item.category}">
+                            ${item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                        </span>
+                    </td>
+                    <td>${formatDate(item.added_date)}</td>
+                    <td class="status-${item.status}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</td>
+                    <td>${item.blocked_count || 0}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editDomain(${item.id})" title="Edit XGBoost Entry">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn toggle-btn" onclick="toggleStatus(${item.id})" title="${item.status === 'active' ? 'Disable XGBoost Protection' : 'Enable XGBoost Protection'}">
+                                <i class="fas fa-${item.status === 'active' ? 'pause' : 'play'}"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteDomain(${item.id})" title="Remove from XGBoost Blacklist">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Edit domain
+        function editDomain(id) {
+            const item = allBlacklist.find(item => item.id === id);
+            if (!item) return;
+
+            editingItem = item;
+            
+            document.getElementById('edit-domain').value = item.domain;
+            document.getElementById('edit-category').value = item.category;
+            document.getElementById('edit-description').value = item.description || '';
+            
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        // Save edit
+        async function saveEdit() {
+            if (!editingItem) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/${editingItem.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        category: document.getElementById('edit-category').value,
+                        description: document.getElementById('edit-description').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeEditModal();
+                    await loadBlacklist();
+                    showNotification('XGBoost blacklist entry updated successfully', 'success');
+                } else {
+                    throw new Error(data.detail || 'Failed to update XGBoost blacklist entry');
+                }
+            } catch (error) {
+                console.error('Error updating XGBoost blacklist entry:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Toggle domain status
+        async function toggleStatus(id) {
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/toggle/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    await loadBlacklist();
+                    await loadStats();
+                    showNotification(data.message || 'XGBoost blacklist status updated', 'success');
+                } else {
+                    throw new Error(data.detail || 'Failed to toggle XGBoost blacklist status');
+                }
+            } catch (error) {
+                console.error('Error toggling XGBoost blacklist status:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Delete domain
+        async function deleteDomain(id) {
+            const item = allBlacklist.find(item => item.id === id);
+            if (!item) return;
+            
+            if (confirm(`Are you sure you want to remove "${item.domain}" from your XGBoost blacklist?`)) {
+                try {
+                    const response = await fetch(`${API_BASE}/blacklist/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        await loadBlacklist();
+                        await loadStats();
+                        showNotification(data.message || `Removed ${item.domain} from XGBoost blacklist`, 'success');
+                    } else {
+                        throw new Error(data.detail || 'Failed to delete from XGBoost blacklist');
+                    }
+                } catch (error) {
+                    console.error('Error deleting from XGBoost blacklist:', error);
+                    showNotification(error.message, 'error');
+                }
+            }
+        }
+
+        // Show bulk import modal
+        function showBulkImport() {
+            document.getElementById('bulk-modal').style.display = 'block';
+        }
+
+        // Bulk import domains
+        async function bulkImport() {
+            const domainsText = document.getElementById('bulk-domains').value.trim();
+            const category = document.getElementById('bulk-category').value;
+
+            if (!domainsText) {
+                showNotification('Please enter domains to import to XGBoost blacklist', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/bulk-import`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        domains: domainsText,
+                        category: category
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    closeBulkModal();
+                    await loadBlacklist();
+                    await loadStats();
+                    showNotification(data.message || 'Domains imported to XGBoost blacklist successfully', 'success');
+                } else {
+                    throw new Error(data.detail || 'Failed to import domains to XGBoost blacklist');
+                }
+            } catch (error) {
+                console.error('Error importing domains to XGBoost blacklist:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Clear all blacklist
+        async function clearAllBlacklist() {
+            if (confirm('Are you sure you want to clear ALL domains from your XGBoost blacklist? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`${API_BASE}/blacklist`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        await loadBlacklist();
+                        await loadStats();
+                        showNotification(data.message || 'XGBoost blacklist cleared successfully', 'success');
+                    } else {
+                        throw new Error(data.detail || 'Failed to clear XGBoost blacklist');
+                    }
+                } catch (error) {
+                    console.error('Error clearing XGBoost blacklist:', error);
+                    showNotification(error.message, 'error');
+                }
+            }
+        }
+
+        // Export blacklist
+        async function exportBlacklist() {
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/export`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `xgboost-blacklist-${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showNotification('XGBoost blacklist exported successfully', 'success');
+                } else {
+                    throw new Error('Failed to export XGBoost blacklist');
+                }
+            } catch (error) {
+                console.error('XGBoost export error:', error);
+                showNotification('Failed to export XGBoost blacklist', 'error');
+            }
+        }
+
+        // Modal functions
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            editingItem = null;
+        }
+
+        function closeBulkModal() {
+            document.getElementById('bulk-modal').style.display = 'none';
+            document.getElementById('bulk-domains').value = '';
+        }
+
+        // Show/hide loading state
+        function showLoading(show) {
+            document.getElementById('loading-state').style.display = show ? 'block' : 'none';
+            document.getElementById('blacklist-table').style.display = show ? 'none' : 'table';
+        }
+
+        // Show/hide empty state
+        function showEmptyState() {
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('blacklist-table').style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('blacklist-table').style.display = 'table';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success-color)' : 'var(--error-color)'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                z-index: 1001;
+                font-size: 0.9rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 300px;
+                max-width: 500px;
+            `;
+            
+            const iconClass = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            notification.innerHTML = `
+                <i class="fas fa-${iconClass}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            const duration = type === 'error' ? 5000 : 3000;
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', function(event) {
+            console.error('Global error in XGBoost blacklist:', event.error);
+            showNotification('An unexpected error occurred in XGBoost blacklist management', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection in XGBoost blacklist:', event.reason);
+            showNotification('A network error occurred while managing XGBoost blacklist', 'error');
+        });
+    </script>
+</body>
+</html>

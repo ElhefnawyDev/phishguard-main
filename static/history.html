@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XGBoost Scan History - PHISHING URL DETECTION USING XGBOOST ALGORITHM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Enhanced Filters Section */
+        .filters-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filters-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .filters-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced History Table */
+        .history-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .history-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        }
+
+        .history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .export-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Table */
+        .history-table-container {
+            overflow-x: auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .history-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8fafc;
+            transform: scale(1.01);
+        }
+
+        .url-cell {
+            max-width: 350px;
+            word-break: break-all;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Enhanced Labels and Badges */
+        .label-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .label-safe {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .label-phishing {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .label-blacklisted {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* Enhanced Confidence Bar */
+        .confidence-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .confidence-bar {
+            width: 80px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .confidence-safe {
+            background: linear-gradient(90deg, var(--success-color), #059669);
+        }
+
+        .confidence-phishing {
+            background: linear-gradient(90deg, var(--error-color), #dc2626);
+        }
+
+        .confidence-text {
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 40px;
+        }
+
+        /* Enhanced Risk Score */
+        .risk-score {
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .risk-low {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        .risk-medium {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .risk-high {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+        }
+
+        /* Enhanced Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .view-btn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .rescan-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .rescan-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Enhanced Loading and Empty States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .detail-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: var(--text-secondary);
+            text-align: right;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        /* Enhanced Search Highlight */
+        .highlight {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .history-table {
+                font-size: 0.8rem;
+            }
+
+            .url-cell {
+                max-width: 200px;
+                font-size: 0.7rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .logo {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .navbar, .filters-section, .action-buttons, .pagination {
+                display: none;
+            }
+            
+            .history-section {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .history-table th {
+                background: #f5f5f5 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    PHISHING URL DETECTION<br>
+                    <small style="font-size: 0.7em; color: #64748b;">USING XGBOOST ALGORITHM</small>
+                </div>
+            </a>
+            
+            <div class="nav-right">
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <h1 class="page-title">XGBoost Scan History</h1>
+            <p class="page-subtitle">View and manage all your XGBoost URL security scans with advanced ML analysis</p>
+        </div>
+
+        <!-- Enhanced Statistics -->
+        <div class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-value" id="total-scans">0</div>
+                <div class="stat-label">Total XGBoost Scans</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="safe-scans">0</div>
+                <div class="stat-label">Safe URLs Verified</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="phishing-scans">0</div>
+                <div class="stat-label">Threats Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy-rate">98.5%</div>
+                <div class="stat-label">XGBoost Accuracy</div>
+            </div>
+        </div>
+
+        <!-- Enhanced Filters -->
+        <div class="filters-section fade-in-up">
+            <div class="filters-header">
+                <h3 class="filters-title">
+                    <i class="fas fa-filter"></i>
+                    Filter XGBoost Results
+                </h3>
+            </div>
+            
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filter-url">Search URLs</label>
+                    <input type="text" id="filter-url" class="filter-input" placeholder="Enter URL to search XGBoost results...">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-result">XGBoost Result Type</label>
+                    <select id="filter-result" class="filter-input">
+                        <option value="">All XGBoost Results</option>
+                        <option value="safe">Safe URLs</option>
+                        <option value="phishing">Phishing Threats</option>
+                        <option value="blacklisted">Blacklisted</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-date-from">Date From</label>
+                    <input type="date" id="filter-date-from" class="filter-input">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-date-to">Date To</label>
+                    <input type="date" id="filter-date-to" class="filter-input">
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-confidence">Min XGBoost Confidence</label>
+                    <input type="range" id="filter-confidence" class="filter-input" min="0" max="100" value="0">
+                    <span id="confidence-value">0%</span>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-risk">Max Risk Score</label>
+                    <input type="range" id="filter-risk" class="filter-input" min="0" max="100" value="100">
+                    <span id="risk-value">100</span>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times"></i>
+                    Clear Filters
+                </button>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-search"></i>
+                    Apply XGBoost Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced History Table -->
+        <div class="history-section fade-in-up">
+            <div class="history-header">
+                <h3 class="history-title">XGBoost Scan Results</h3>
+                <button class="btn export-btn" onclick="exportHistory()">
+                    <i class="fas fa-download"></i>
+                    Export XGBoost CSV
+                </button>
+            </div>
+            
+            <div class="history-table-container">
+                <table class="history-table" id="history-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>XGBoost Result</th>
+                            <th>XGBoost Confidence</th>
+                            <th>Risk Score</th>
+                            <th>Scan Date</th>
+                            <th>Processing Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- Table rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                Loading XGBoost scan history...
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No XGBoost scans found</h3>
+                <p>No URL scans match your current filters. Try adjusting your search criteria or start scanning URLs with XGBoost.</p>
+            </div>
+            
+            <!-- Enhanced Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="pagination-btn" id="first-btn" onclick="goToPage(1)">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                
+                <button class="pagination-btn" id="prev-btn" onclick="changePage(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </button>
+                
+                <div class="pagination-info" id="pagination-info">
+                    Page 1 of 1
+                </div>
+                
+                <button class="pagination-btn" id="next-btn" onclick="changePage(1)">
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <button class="pagination-btn" id="last-btn" onclick="goToLastPage()">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Scan Detail Modal -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">XGBoost Scan Details</h3>
+                <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            
+            <div class="detail-grid" id="detail-content">
+                <!-- Detail content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let authToken = localStorage.getItem('authToken');
+        let currentPage = 1;
+        let itemsPerPage = 15;
+        let totalItems = 0;
+        let totalPages = 0;
+        let allScans = [];
+        let filteredScans = [];
+        let searchTimeout = null;
+
+        // Enhanced authentication check
+        if (!authToken) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize page with enhanced error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                loadScanHistory();
+                setupEventListeners();
+                setupKeyboardShortcuts();
+                handleUrlHash();
+            } catch (error) {
+                console.error('XGBoost initialization error:', error);
+                showNotification('Failed to initialize XGBoost history page', 'error');
+            }
+        });
+
+        // Enhanced event listeners setup
+        function setupEventListeners() {
+            // Real-time search with debouncing
+            document.getElementById('filter-url').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
+            
+            // Filter changes
+            document.getElementById('filter-result').addEventListener('change', applyFilters);
+            document.getElementById('filter-date-from').addEventListener('change', applyFilters);
+            document.getElementById('filter-date-to').addEventListener('change', applyFilters);
+            
+            // Range sliders
+            const confidenceSlider = document.getElementById('filter-confidence');
+            const riskSlider = document.getElementById('filter-risk');
+            
+            confidenceSlider.addEventListener('input', function() {
+                document.getElementById('confidence-value').textContent = this.value + '%';
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
+            
+            riskSlider.addEventListener('input', function() {
+                document.getElementById('risk-value').textContent = this.value;
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('detail-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDetailModal();
+                }
+            });
+
+            // Handle browser back/forward
+            window.addEventListener('popstate', function(e) {
+                if (e.state && e.state.page) {
+                    currentPage = e.state.page;
+                    displayScans();
+                }
+            });
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'f':
+                            e.preventDefault();
+                            document.getElementById('filter-url').focus();
+                            break;
+                        case 'e':
+                            e.preventDefault();
+                            exportHistory();
+                            break;
+                    }
+                }
+                if (e.key === 'Escape') {
+                    closeDetailModal();
+                }
+                // Pagination shortcuts
+                if (e.key === 'ArrowLeft' && e.altKey) {
+                    e.preventDefault();
+                    changePage(-1);
+                }
+                if (e.key === 'ArrowRight' && e.altKey) {
+                    e.preventDefault();
+                    changePage(1);
+                }
+            });
+        }
+
+        // Handle URL hash for direct scan access
+        function handleUrlHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#scan-')) {
+                const scanId = parseInt(hash.replace('#scan-', ''));
+                setTimeout(() => {
+                    const scan = allScans.find(s => s.id === scanId);
+                    if (scan) {
+                        viewScanDetails(scanId);
+                    }
+                }, 1000);
+            }
+        }
+
+        // Enhanced load scan history with retry mechanism
+        async function loadScanHistory(retryCount = 0) {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/history?limit=1000`, {
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allScans = await response.json();
+                } else if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                    return;
+                } else {
+                    throw new Error('Failed to load XGBoost scan history');
+                }
+                
+                filteredScans = [...allScans];
+                updateStatistics();
+                displayScans();
+            } catch (error) {
+                console.error('XGBoost history loading error:', error);
+                
+                if (retryCount < 2) {
+                    setTimeout(() => loadScanHistory(retryCount + 1), 1000);
+                } else {
+                    showEmptyState();
+                    showNotification('Failed to load XGBoost scan history after multiple attempts', 'error');
+                }
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Enhanced statistics update with animations
+        function updateStatistics() {
+            const totalScans = allScans.length;
+            const safeScans = allScans.filter(scan => !scan.label.includes('Phishing')).length;
+            const phishingScans = allScans.filter(scan => scan.label.includes('Phishing')).length;
+
+            animateCounter('total-scans', totalScans);
+            animateCounter('safe-scans', safeScans);
+            animateCounter('phishing-scans', phishingScans);
+        }
+
+        // Smooth counter animation
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const startValue = parseInt(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.round(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Enhanced apply filters with search highlighting
+        function applyFilters() {
+            const urlFilter = document.getElementById('filter-url').value.toLowerCase();
+            const resultFilter = document.getElementById('filter-result').value;
+            const dateFromFilter = document.getElementById('filter-date-from').value;
+            const dateToFilter = document.getElementById('filter-date-to').value;
+            const confidenceFilter = parseInt(document.getElementById('filter-confidence').value);
+            const riskFilter = parseInt(document.getElementById('filter-risk').value);
+
+            filteredScans = allScans.filter(scan => {
+                // URL filter with highlighting
+                if (urlFilter && !scan.url.toLowerCase().includes(urlFilter)) {
+                    return false;
+                }
+
+                // Result filter
+                if (resultFilter) {
+                    const isPhishing = scan.label.includes('Phishing');
+                    const isBlacklisted = scan.label.includes('Blacklisted');
+                    if (resultFilter === 'safe' && (isPhishing || isBlacklisted)) return false;
+                    if (resultFilter === 'phishing' && !isPhishing) return false;
+                    if (resultFilter === 'blacklisted' && !isBlacklisted) return false;
+                }
+
+                // Date filters
+                const scanDate = new Date(scan.scan_date).toISOString().split('T')[0];
+                if (dateFromFilter && scanDate < dateFromFilter) return false;
+                if (dateToFilter && scanDate > dateToFilter) return false;
+
+                // Confidence filter
+                if (scan.confidence < confidenceFilter) return false;
+
+                // Risk filter
+                if (scan.risk_score > riskFilter) return false;
+
+                return true;
+            });
+
+            currentPage = 1;
+            totalItems = filteredScans.length;
+            totalPages = Math.ceil(totalItems / itemsPerPage);
+            displayScans();
+            updatePagination();
+
+            // Update filter indicator
+            const activeFilters = [urlFilter, resultFilter, dateFromFilter, dateToFilter].filter(Boolean).length +
+                                 (confidenceFilter > 0 ? 1 : 0) + (riskFilter < 100 ? 1 : 0);
+            
+            const historyTitle = document.querySelector('.history-title');
+            if (activeFilters > 0) {
+                historyTitle.textContent = `XGBoost Scan Results (${filteredScans.length} of ${allScans.length})`;
+            } else {
+                historyTitle.textContent = 'XGBoost Scan Results';
+            }
+        }
+
+        // Enhanced clear filters
+        function clearFilters() {
+            document.getElementById('filter-url').value = '';
+            document.getElementById('filter-result').value = '';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.getElementById('filter-confidence').value = '0';
+            document.getElementById('filter-risk').value = '100';
+            document.getElementById('confidence-value').textContent = '0%';
+            document.getElementById('risk-value').textContent = '100';
+            
+            filteredScans = [...allScans];
+            currentPage = 1;
+            totalItems = filteredScans.length;
+            totalPages = Math.ceil(totalItems / itemsPerPage);
+            displayScans();
+            updatePagination();
+            
+            document.querySelector('.history-title').textContent = 'XGBoost Scan Results';
+            showNotification('XGBoost filters cleared', 'success');
+        }
+
+        // Enhanced display scans with better performance
+        function displayScans() {
+            const tbody = document.getElementById('history-tbody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageScans = filteredScans.slice(startIndex, endIndex);
+
+            if (pageScans.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideEmptyState();
+
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            const urlFilter = document.getElementById('filter-url').value.toLowerCase();
+            
+            pageScans.forEach(scan => {
+                const isPhishing = scan.label.includes('Phishing');
+                const riskLevel = scan.risk_score > 70 ? 'high' : scan.risk_score > 30 ? 'medium' : 'low';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="url-cell">${highlightText(scan.url, urlFilter)}</td>
+                    <td>
+                        <span class="label-badge ${getLabelClass(scan.label)}">
+                            ${scan.label}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="confidence-container">
+                            <div class="confidence-bar">
+                                <div class="confidence-fill ${isPhishing ? 'confidence-phishing' : 'confidence-safe'}" 
+                                     style="width: ${scan.confidence}%"></div>
+                            </div>
+                            <span class="confidence-text">${scan.confidence}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="risk-score risk-${riskLevel}">
+                            ${scan.risk_score}
+                        </span>
+                    </td>
+                    <td title="${formatFullDate(scan.scan_date)}">${formatDate(scan.scan_date)}</td>
+                    <td>${scan.prediction_time || 'N/A'}s</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn view-btn" onclick="viewScanDetails(${scan.id})" title="View XGBoost Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn rescan-btn" onclick="rescanUrl('${encodeURIComponent(scan.url)}')" title="Rescan with XGBoost">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteScan(${scan.id})" title="Delete XGBoost Scan">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                fragment.appendChild(row);
+            });
+
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
+
+            // Update browser history
+            const url = new URL(window.location);
+            url.searchParams.set('page', currentPage);
+            history.pushState({page: currentPage}, '', url);
+        }
+
+        // Highlight search text
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Enhanced view scan details
+        function viewScanDetails(scanId) {
+            const scan = allScans.find(s => s.id === scanId);
+            if (!scan) return;
+
+            const detailContent = document.getElementById('detail-content');
+            const isPhishing = scan.label.includes('Phishing');
+
+            // Update URL hash
+            window.location.hash = `scan-${scanId}`;
+
+            let featuresHtml = '';
+            if (scan.features) {
+                try {
+                    const features = typeof scan.features === 'string' ? JSON.parse(scan.features) : scan.features;
+                    featuresHtml = Object.entries(features).map(([key, value]) => 
+                        `<div><strong>${formatFeatureName(key)}:</strong> ${formatFeatureValue(key, value)}</div>`
+                    ).join('');
+                } catch (e) {
+                    featuresHtml = 'XGBoost feature data unavailable';
+                }
+            }
+
+            detailContent.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">URL:</span>
+                    <span class="detail-value" style="word-break: break-all;">${scan.url}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">XGBoost Result:</span>
+                    <span class="detail-value">
+                        <span class="label-badge ${getLabelClass(scan.label)}">
+                            ${scan.label}
+                        </span>
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">XGBoost Confidence:</span>
+                    <span class="detail-value">${scan.confidence}%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Risk Score:</span>
+                    <span class="detail-value">${scan.risk_score}/100</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Scan Date:</span>
+                    <span class="detail-value">${formatFullDate(scan.scan_date)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Processing Time:</span>
+                    <span class="detail-value">${scan.prediction_time || 'N/A'}s</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Algorithm:</span>
+                    <span class="detail-value">XGBoost Machine Learning</span>
+                </div>
+                ${featuresHtml ? `
+                    <div class="detail-item">
+                        <span class="detail-label">XGBoost Features:</span>
+                        <span class="detail-value">
+                            ${featuresHtml}
+                        </span>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detail-modal').style.display = 'block';
+        }
+
+        // Enhanced rescan functionality
+        async function rescanUrl(encodedUrl) {
+            const url = decodeURIComponent(encodedUrl);
+            
+            if (!confirm(`Rescan "${url}" with XGBoost algorithm?`)) {
+                return;
+            }
+
+            try {
+                showNotification('Rescanning with XGBoost...', 'info');
+                
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showNotification('XGBoost rescan completed successfully', 'success');
+                    
+                    // Reload history to show new scan
+                    await loadScanHistory();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'XGBoost rescan failed');
+                }
+            } catch (error) {
+                console.error('XGBoost rescan error:', error);
+                showNotification('XGBoost rescan failed: ' + error.message, 'error');
+            }
+        }
+
+        // Enhanced delete scan
+        async function deleteScan(scanId) {
+            const scan = allScans.find(s => s.id === scanId);
+            if (!scan) return;
+            
+            if (!confirm(`Delete XGBoost scan for "${scan.url}"?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/history/${scanId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    // Remove from local arrays
+                    allScans = allScans.filter(scan => scan.id !== scanId);
+                    filteredScans = filteredScans.filter(scan => scan.id !== scanId);
+                    
+                    // Recalculate pagination
+                    totalItems = filteredScans.length;
+                    totalPages = Math.ceil(totalItems / itemsPerPage);
+                    
+                    // Adjust current page if necessary
+                    if (currentPage > totalPages && totalPages > 0) {
+                        currentPage = totalPages;
+                    }
+                    
+                    updateStatistics();
+                    displayScans();
+                    updatePagination();
+                    showNotification('XGBoost scan deleted successfully', 'success');
+                } else {
+                    throw new Error('Failed to delete XGBoost scan');
+                }
+            } catch (error) {
+                console.error('Delete XGBoost scan error:', error);
+                showNotification('Failed to delete XGBoost scan', 'error');
+            }
+        }
+
+        // Enhanced pagination functions
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayScans();
+                updatePagination();
+                
+                // Smooth scroll to top of table
+                document.querySelector('.history-table-container').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+
+        function goToPage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayScans();
+                updatePagination();
+            }
+        }
+
+        function goToLastPage() {
+            if (totalPages > 0) {
+                currentPage = totalPages;
+                displayScans();
+                updatePagination();
+            }
+        }
+
+        // Enhanced pagination update
+        function updatePagination() {
+            const firstBtn = document.getElementById('first-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const lastBtn = document.getElementById('last-btn');
+            const paginationInfo = document.getElementById('pagination-info');
+
+            firstBtn.disabled = currentPage === 1;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+            lastBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+            
+            paginationInfo.innerHTML = `
+                <div>Page ${currentPage} of ${totalPages || 1}</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    Showing ${startItem}-${endItem} of ${totalItems.toLocaleString()} XGBoost scans
+                </div>
+            `;
+        }
+
+        // Enhanced export with progress indicator
+        async function exportHistory() {
+            try {
+                showNotification('Preparing XGBoost history export...', 'info');
+                
+                const csvContent = generateCSV(filteredScans);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `xgboost-scan-history-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showNotification('XGBoost history exported successfully', 'success');
+            } catch (error) {
+                console.error('XGBoost export error:', error);
+                showNotification('Failed to export XGBoost history', 'error');
+            }
+        }
+
+        // Enhanced CSV generation
+        function generateCSV(scans) {
+            const headers = [
+                'URL', 
+                'XGBoost Result', 
+                'XGBoost Confidence (%)', 
+                'Risk Score', 
+                'Scan Date', 
+                'Processing Time (s)',
+                'Algorithm'
+            ];
+            
+            const rows = scans.map(scan => [
+                `"${scan.url.replace(/"/g, '""')}"`,
+                `"${scan.label}"`,
+                scan.confidence,
+                scan.risk_score,
+                `"${formatFullDate(scan.scan_date)}"`,
+                scan.prediction_time || 'N/A',
+                'XGBoost'
+            ]);
+
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+
+            // Add BOM for proper UTF-8 encoding in Excel
+            return '\ufeff' + csvContent;
+        }
+
+        // Modal functions
+        function closeDetailModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+            // Clear URL hash
+            if (window.location.hash.startsWith('#scan-')) {
+                history.pushState('', document.title, window.location.pathname + window.location.search);
+            }
+        }
+
+        // Enhanced utility functions
+        function showLoading(show) {
+            document.getElementById('loading-state').style.display = show ? 'block' : 'none';
+            document.getElementById('history-table').style.display = show ? 'none' : 'table';
+            document.getElementById('pagination').style.display = show ? 'none' : 'flex';
+        }
+
+        function showEmptyState() {
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('history-table').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('history-table').style.display = 'table';
+            document.getElementById('pagination').style.display = 'flex';
+        }
+
+        function getLabelClass(label) {
+            if (label.includes('Blacklisted')) return 'label-blacklisted';
+            if (label.includes('Phishing')) return 'label-phishing';
+            return 'label-safe';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                return 'Today';
+            } else if (diffDays === 2) {
+                return 'Yesterday';
+            } else if (diffDays <= 7) {
+                return `${diffDays - 1} days ago`;
+            } else {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+
+        function formatFullDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function formatFeatureName(name) {
+            return name.replace(/_/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase())
+                      .replace(/Url/g, 'URL')
+                      .replace(/Http/g, 'HTTP')
+                      .replace(/Https/g, 'HTTPS');
+        }
+
+        function formatFeatureValue(key, value) {
+            if (typeof value === 'boolean') {
+                return value ? 'Yes' : 'No';
+            }
+            if (typeof value === 'number') {
+                return value % 1 === 0 ? value.toString() : value.toFixed(2);
+            }
+            return value;
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${getNotificationColor(type)};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                z-index: 1001;
+                font-size: 0.9rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 300px;
+                max-width: 500px;
+            `;
+            
+            const iconClass = getNotificationIcon(type);
+            notification.innerHTML = `
+                <i class="fas fa-${iconClass}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            const duration = type === 'error' ? 5000 : 3000;
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
+        }
+
+        function getNotificationColor(type) {
+            switch(type) {
+                case 'success': return 'var(--success-color)';
+                case 'error': return 'var(--error-color)';
+                case 'warning': return 'var(--warning-color)';
+                case 'info': return 'var(--primary-color)';
+                default: return 'var(--success-color)';
+            }
+        }
+
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return 'check-circle';
+                case 'error': return 'exclamation-circle';
+                case 'warning': return 'exclamation-triangle';
+                case 'info': return 'info-circle';
+                default: return 'check-circle';
+            }
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', function(event) {
+            console.error('Global error in XGBoost history:', event.error);
+            showNotification('An unexpected error occurred in XGBoost history', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection in XGBoost history:', event.reason);
+            showNotification('A network error occurred while loading XGBoost data', 'error');
+        });
+
+        // Performance monitoring
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                    console.log(`XGBoost History page loaded in ${loadTime}ms`);
+                }, 0);
+            });
+        }
+
+        // Auto-refresh for real-time updates
+        let refreshInterval;
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    loadScanHistory();
+                }
+            }, 30000); // Refresh every 30 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+
+        // Handle page visibility for performance optimization
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                startAutoRefresh();
+                // Refresh data when user returns to tab
+                loadScanHistory();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+
+        // Initialize auto-refresh
+        startAutoRefresh();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
+        });
+    </script>
+</body>
+</html>

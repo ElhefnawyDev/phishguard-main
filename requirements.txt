@@ -1,0 +1,43 @@
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database & ORM
+sqlalchemy==2.0.23
+pymysql==1.1.0
+cryptography==41.0.7
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.6
+bcrypt==4.1.1
+python-dotenv==1.0.0
+passlib[bcrypt]==1.7.4
+
+# Machine Learning - XGBoost Integration
+xgboost==2.0.2
+pandas==2.1.3
+numpy==1.25.2
+scikit-learn==1.3.2
+
+# Validation & Serialization
+pydantic[email]==2.5.0
+
+# URL Processing
+tldextract==5.1.1
+requests==2.31.0
+
+# File Processing
+openpyxl==3.1.2
+
+# Development Tools
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0
+
+# Production
+gunicorn==21.2.0
+
+# Utilities
+python-dateutil==2.8.2
+click==8.1.7

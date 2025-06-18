@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XGBoost Preferences - PHISHING URL DETECTION USING XGBOOST ALGORITHM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Preference Sections */
+        .preference-section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .preference-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .preference-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .preference-item:last-child {
+            border-bottom: none;
+        }
+
+        .preference-item:hover {
+            background: #f8fafc;
+            margin: 0 -1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-radius: 8px;
+        }
+
+        .preference-info {
+            flex: 1;
+            margin-right: 2rem;
+        }
+
+        .preference-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .preference-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Enhanced Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: var(--transition);
+            border-radius: 28px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(28px);
+        }
+
+        /* Enhanced Select Dropdown */
+        .preference-select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            min-width: 150px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .preference-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Enhanced Button Group */
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .button-group button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .button-group button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .button-group button:hover:not(.active) {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Color Picker */
+        .color-picker {
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .color-picker:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-picker input[type="color"] {
+            width: 100%;
+            height: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Enhanced Slider */
+        .preference-slider {
+            width: 150px;
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .preference-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            transition: var(--transition);
+        }
+
+        .preference-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .preference-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider-value {
+            margin-left: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Enhanced Action Buttons */
+        .btn-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Notification Preferences */
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notification-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-security { background: linear-gradient(135deg, var(--error-color), #dc2626); }
+        .icon-scan { background: linear-gradient(135deg, var(--success-color), #059669); }
+        .icon-report { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .icon-update { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-color));
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .logo {
+                font-size: 0.8rem;
+            }
+
+            .preference-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+
+            .preference-info {
+                margin-right: 0;
+            }
+
+            .btn-actions {
+                flex-direction: column;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .button-group {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Dark mode styles for XGBoost theme */
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        .dark-mode .preference-item:hover {
+            background: #334155;
+        }
+
+        .dark-mode .notification-item {
+            background: linear-gradient(135deg, #1e293b, #334155);
+        }
+
+        .dark-mode .button-group {
+            background: #334155;
+        }
+
+        .dark-mode .preference-select {
+            background: #334155;
+            border-color: #475569;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    PHISHING URL DETECTION<br>
+                    <small style="font-size: 0.7em; color: #64748b;">USING XGBOOST ALGORITHM</small>
+                </div>
+            </a>
+            
+            <div class="nav-right">
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <h1 class="page-title">XGBoost Preferences</h1>
+            <p class="page-subtitle">Customize your XGBoost experience and security settings for optimal phishing detection</p>
+        </div>
+
+        <!-- General Preferences -->
+        <div class="preference-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-cog"></i>
+                General XGBoost Settings
+            </h3>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Dark Mode</div>
+                    <div class="preference-description">Switch between light and dark themes for the XGBoost interface</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="dark-mode">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Language</div>
+                    <div class="preference-description">Choose your preferred language for XGBoost interface</div>
+                </div>
+                <select class="preference-select" id="language">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Time Zone</div>
+                    <div class="preference-description">Set your local time zone for accurate XGBoost scan timestamps</div>
+                </div>
+                <select class="preference-select" id="timezone">
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">Eastern Time</option>
+                    <option value="America/Chicago">Central Time</option>
+                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Los_Angeles">Pacific Time</option>
+                    <option value="Europe/London">GMT</option>
+                    <option value="Europe/Paris">CET</option>
+                    <option value="Asia/Tokyo">JST</option>
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Auto-save XGBoost Scans</div>
+                    <div class="preference-description">Automatically save all XGBoost scan results to your history</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="auto-save" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Security Preferences -->
+        <div class="preference-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                XGBoost Security Settings
+            </h3>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">XGBoost Scan Sensitivity</div>
+                    <div class="preference-description">Adjust the sensitivity level of XGBoost phishing detection algorithm</div>
+                </div>
+                <div class="button-group">
+                    <button class="sensitivity-btn" data-value="low">Low</button>
+                    <button class="sensitivity-btn active" data-value="medium">Medium</button>
+                    <button class="sensitivity-btn" data-value="high">High</button>
+                </div>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Real-time XGBoost Protection</div>
+                    <div class="preference-description">Enable real-time URL scanning with XGBoost while browsing</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="realtime-protection" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Whitelist Trusted Domains</div>
+                    <div class="preference-description">Automatically trust verified domains and skip XGBoost scanning</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="whitelist-domains" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Session Timeout</div>
+                    <div class="preference-description">Automatically log out after period of inactivity for security</div>
+                </div>
+                <select class="preference-select" id="session-timeout">
+                    <option value="30">30 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="120">2 hours</option>
+                    <option value="240">4 hours</option>
+                    <option value="0">Never</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Notification Preferences -->
+        <div class="preference-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-bell"></i>
+                XGBoost Notification Settings
+            </h3>
+
+            <div class="notification-item">
+                <div class="notification-info">
+                    <div class="notification-icon icon-security">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <div class="preference-title">XGBoost Security Alerts</div>
+                        <div class="preference-description">Get notified when XGBoost detects phishing threats</div>
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="security-alerts" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-info">
+                    <div class="notification-icon icon-scan">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div>
+                        <div class="preference-title">XGBoost Scan Completion</div>
+                        <div class="preference-description">Receive notifications when XGBoost scans are completed</div>
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="scan-completion">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-info">
+                    <div class="notification-icon icon-report">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <div class="preference-title">Weekly XGBoost Reports</div>
+                        <div class="preference-description">Get weekly summaries of your XGBoost scanning activity</div>
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="weekly-reports">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-info">
+                    <div class="notification-icon icon-update">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div>
+                        <div class="preference-title">XGBoost System Updates</div>
+                        <div class="preference-description">Be notified about new XGBoost features and security updates</div>
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="system-updates" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Display Preferences -->
+        <div class="preference-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-palette"></i>
+                XGBoost Display Settings
+            </h3>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">XGBoost Theme Color</div>
+                    <div class="preference-description">Choose your preferred accent color for XGBoost interface</div>
+                </div>
+                <div class="color-picker">
+                    <input type="color" id="theme-color" value="#667eea">
+                </div>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">XGBoost Results Per Page</div>
+                    <div class="preference-description">Number of XGBoost scan results to display per page</div>
+                </div>
+                <select class="preference-select" id="results-per-page">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Animation Speed</div>
+                    <div class="preference-description">Control the speed of XGBoost interface animations</div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <input type="range" class="preference-slider" id="animation-speed" min="0.5" max="2" step="0.1" value="1">
+                    <span class="slider-value" id="animation-speed-value">1x</span>
+                </div>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Compact Mode</div>
+                    <div class="preference-description">Use a more compact layout to display more XGBoost information</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="compact-mode">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Privacy Preferences -->
+        <div class="preference-section fade-in-up">
+            <h3 class="section-title">
+                <i class="fas fa-user-shield"></i>
+                XGBoost Privacy Settings
+            </h3>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">XGBoost Analytics</div>
+                    <div class="preference-description">Help improve XGBoost by sharing anonymous usage data</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="analytics" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">XGBoost History Retention</div>
+                    <div class="preference-description">How long to keep your XGBoost scan history</div>
+                </div>
+                <select class="preference-select" id="history-retention">
+                    <option value="30">30 days</option>
+                    <option value="90">90 days</option>
+                    <option value="180">6 months</option>
+                    <option value="365">1 year</option>
+                    <option value="0">Forever</option>
+                </select>
+            </div>
+
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-title">Public XGBoost Profile</div>
+                    <div class="preference-description">Allow others to see your public XGBoost scanning statistics</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="public-profile">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-actions fade-in-up">
+            <button class="btn btn-secondary" onclick="resetToDefaults()">
+                <i class="fas fa-undo"></i>
+                Reset XGBoost Defaults
+            </button>
+            <button class="btn btn-primary" onclick="savePreferences()">
+                <i class="fas fa-save"></i>
+                Save XGBoost Preferences
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let authToken = localStorage.getItem('authToken');
+        let preferences = {};
+
+        // Default XGBoost preferences
+        const defaultPreferences = {
+            darkMode: false,
+            language: 'en',
+            timezone: 'UTC',
+            autoSave: true,
+            scanSensitivity: 'medium',
+            realtimeProtection: true,
+            whitelistDomains: true,
+            sessionTimeout: 60,
+            securityAlerts: true,
+            scanCompletion: false,
+            weeklyReports: false,
+            systemUpdates: true,
+            themeColor: '#667eea',
+            resultsPerPage: 10,
+            animationSpeed: 1,
+            compactMode: false,
+            analytics: true,
+            historyRetention: 365,
+            publicProfile: false
+        };
+
+        // Check authentication
+        if (!authToken) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPreferences();
+            setupEventListeners();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Sensitivity buttons
+            document.querySelectorAll('.sensitivity-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.sensitivity-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Animation speed slider
+            const animationSlider = document.getElementById('animation-speed');
+            const animationValue = document.getElementById('animation-speed-value');
+            
+            animationSlider.addEventListener('input', function() {
+                animationValue.textContent = this.value + 'x';
+            });
+
+            // Theme color picker
+            document.getElementById('theme-color').addEventListener('change', function() {
+                applyThemeColor(this.value);
+            });
+        }
+
+        // Load user preferences
+        async function loadPreferences() {
+            try {
+                const response = await fetch(`${API_BASE}/users/preferences`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    preferences = await response.json();
+                } else {
+                    // Use default preferences if none exist
+                    preferences = { ...defaultPreferences };
+                }
+                
+                applyPreferences();
+            } catch (error) {
+                console.error('Failed to load XGBoost preferences:', error);
+                preferences = { ...defaultPreferences };
+                applyPreferences();
+            }
+        }
+
+        // Apply preferences to UI
+        function applyPreferences() {
+            // General settings
+            document.getElementById('dark-mode').checked = preferences.darkMode || false;
+            document.getElementById('language').value = preferences.language || 'en';
+            document.getElementById('timezone').value = preferences.timezone || 'UTC';
+            document.getElementById('auto-save').checked = preferences.autoSave !== false;
+
+            // Security settings
+            const sensitivity = preferences.scanSensitivity || 'medium';
+            document.querySelectorAll('.sensitivity-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.value === sensitivity);
+            });
+            
+            document.getElementById('realtime-protection').checked = preferences.realtimeProtection !== false;
+            document.getElementById('whitelist-domains').checked = preferences.whitelistDomains !== false;
+            document.getElementById('session-timeout').value = preferences.sessionTimeout || 60;
+
+            // Notification settings
+            document.getElementById('security-alerts').checked = preferences.securityAlerts !== false;
+            document.getElementById('scan-completion').checked = preferences.scanCompletion || false;
+            document.getElementById('weekly-reports').checked = preferences.weeklyReports || false;
+            document.getElementById('system-updates').checked = preferences.systemUpdates !== false;
+
+            // Display settings
+            document.getElementById('theme-color').value = preferences.themeColor || '#667eea';
+            document.getElementById('results-per-page').value = preferences.resultsPerPage || 10;
+            document.getElementById('animation-speed').value = preferences.animationSpeed || 1;
+            document.getElementById('animation-speed-value').textContent = (preferences.animationSpeed || 1) + 'x';
+            document.getElementById('compact-mode').checked = preferences.compactMode || false;
+
+            // Privacy settings
+            document.getElementById('analytics').checked = preferences.analytics !== false;
+            document.getElementById('history-retention').value = preferences.historyRetention || 365;
+            document.getElementById('public-profile').checked = preferences.publicProfile || false;
+
+            // Apply theme
+            if (preferences.darkMode) {
+                document.body.classList.add('dark-mode');
+            }
+            
+            if (preferences.themeColor) {
+                applyThemeColor(preferences.themeColor);
+            }
+        }
+
+        // Apply theme color
+        function applyThemeColor(color) {
+            document.documentElement.style.setProperty('--primary-color', color);
+            document.documentElement.style.setProperty('--theme-color', color);
+            // Update gradients and accents
+            const style = document.createElement('style');
+            style.textContent = `
+                .btn-primary {
+                    background: linear-gradient(135deg, ${color}, ${adjustColor(color, -20)}) !important;
+                }
+                input:checked + .slider {
+                    background: linear-gradient(135deg, ${color}, ${adjustColor(color, -20)}) !important;
+                }
+                .preference-slider::-webkit-slider-thumb {
+                    background: linear-gradient(135deg, ${color}, ${adjustColor(color, -20)}) !important;
+                }
+                .preference-slider::-moz-range-thumb {
+                    background: linear-gradient(135deg, ${color}, ${adjustColor(color, -20)}) !important;
+                }
+                .button-group button.active {
+                    background: linear-gradient(135deg, ${color}, ${adjustColor(color, -20)}) !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Helper function to adjust color brightness
+        function adjustColor(color, amount) {
+            const usePound = color[0] === '#';
+            const col = usePound ? color.slice(1) : color;
+            
+            const num = parseInt(col, 16);
+            let r = (num >> 16) + amount;
+            let g = (num >> 8 & 0x00FF) + amount;
+            let b = (num & 0x0000FF) + amount;
+            
+            r = r > 255 ? 255 : r < 0 ? 0 : r;
+            g = g > 255 ? 255 : g < 0 ? 0 : g;
+            b = b > 255 ? 255 : b < 0 ? 0 : b;
+            
+            return (usePound ? '#' : '') + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+        }
+
+        // Save preferences
+        async function savePreferences() {
+            const updatedPreferences = {
+                darkMode: document.getElementById('dark-mode').checked,
+                language: document.getElementById('language').value,
+                timezone: document.getElementById('timezone').value,
+                autoSave: document.getElementById('auto-save').checked,
+                scanSensitivity: document.querySelector('.sensitivity-btn.active').dataset.value,
+                realtimeProtection: document.getElementById('realtime-protection').checked,
+                whitelistDomains: document.getElementById('whitelist-domains').checked,
+                sessionTimeout: parseInt(document.getElementById('session-timeout').value),
+                securityAlerts: document.getElementById('security-alerts').checked,
+                scanCompletion: document.getElementById('scan-completion').checked,
+                weeklyReports: document.getElementById('weekly-reports').checked,
+                systemUpdates: document.getElementById('system-updates').checked,
+                themeColor: document.getElementById('theme-color').value,
+                resultsPerPage: parseInt(document.getElementById('results-per-page').value),
+                animationSpeed: parseFloat(document.getElementById('animation-speed').value),
+                compactMode: document.getElementById('compact-mode').checked,
+                analytics: document.getElementById('analytics').checked,
+                historyRetention: parseInt(document.getElementById('history-retention').value),
+                publicProfile: document.getElementById('public-profile').checked
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/users/preferences`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(updatedPreferences)
+                });
+
+                if (response.ok) {
+                    preferences = updatedPreferences;
+                    showNotification('XGBoost preferences saved successfully!', 'success');
+                    
+                    // Apply dark mode if changed
+                    if (updatedPreferences.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                } else {
+                    throw new Error('Failed to save XGBoost preferences');
+                }
+            } catch (error) {
+                console.error('Save XGBoost preferences error:', error);
+                showNotification('Failed to save XGBoost preferences. Please try again.', 'error');
+            }
+        }
+
+        // Reset to default preferences
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all XGBoost preferences to default values? This action cannot be undone.')) {
+                preferences = { ...defaultPreferences };
+                applyPreferences();
+                showNotification('XGBoost preferences reset to defaults', 'success');
+            }
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success-color)' : 'var(--error-color)'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                z-index: 1001;
+                font-size: 0.9rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 300px;
+                max-width: 500px;
+            `;
+            
+            const iconClass = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            notification.innerHTML = `
+                <i class="fas fa-${iconClass}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', function(event) {
+            console.error('Global error in XGBoost preferences:', event.error);
+            showNotification('An unexpected error occurred in XGBoost preferences', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection in XGBoost preferences:', event.reason);
+            showNotification('A network error occurred while saving XGBoost preferences', 'error');
+        });
+    </script>
+</body>
+</html>
