@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: phishguard
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.7
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+      - key: ALGORITHM
+        value: HS256
+      - key: APP_NAME
+        value: PhishGuard
+      - key: APP_VERSION
+        value: 3.1.01
+      - key: DEBUG
+        value: false
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        value: 8000
+      - key: CORS_ORIGINS
+        value: '["https://your-app-name.onrender.com"]'
+      - key: MAX_REQUEST_SIZE
+        value: 10MB
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 60
+      - key: BCRYPT_ROUNDS
+        value: 12
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENABLE_DEBUG_ROUTES
+        value: false 
