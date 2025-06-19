@@ -19,6 +19,7 @@ from typing import Optional, Dict, Any, List
 from pathlib import Path
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
+import os
 
 # Import database and models
 from database import get_db, create_tables, test_connection
@@ -1730,4 +1731,5 @@ if __name__ == "__main__":
     print("🔴 Live metrics from your actual database!")
     print("=" * 70)
     
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
